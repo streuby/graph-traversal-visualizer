@@ -1,5 +1,5 @@
 # 🎯 Graph Traversal Visualizer (BFS & DFS) - Interactive Canvas App
-This is an interactive web application that allows users to draw graphs manually on a canvas, choose a traversal method (BFS or DFS), and visualize the order of node visits step by step. Built with HTML, CSS, and JavaScript, this educational tool is ideal for learning, teaching, and experimenting with graph algorithms.
+This is an interactive web application that allows users to draw graphs manually on a canvas, choose a traversal method (BFS or DFS), and visualize the order of node visits step by step. Built with HTML, CSS, and JavaScript, this educational tool is ideal for learning, teaching, and experimenting with graph algorithms. This project was developed as a solution to an assignment given at Nasarawa State University, Keffi, for the course Data Structure (Course Code: CMP719).
 
 ✨ Features
 ✅ Draw your own graph
@@ -43,7 +43,7 @@ graph-traversal-visualizer/
 
 🚀 Getting Started
 To run the project locally:
-git clone https://github.com/yourusername/graph-traversal-visualizer.git
+git clone https://github.com/streuby/graph-traversal-visualizer.git
 cd graph-traversal-visualizer
 open index.html   # or use Live Server extension if using VSCode
 
