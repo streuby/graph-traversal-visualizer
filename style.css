@@ -1,3 +1,4 @@
+/* Reset and base styles */
 * {
   box-sizing: border-box;
 }
@@ -6,8 +7,10 @@ body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
   background-color: #f8f9fa;
+  color: #212529;
 }
 
+/* Header */
 header {
   background-color: #343a40;
   color: white;
@@ -15,6 +18,7 @@ header {
   text-align: center;
 }
 
+/* Layout container */
 .container {
   display: flex;
   flex-direction: column;
@@ -22,11 +26,15 @@ header {
   gap: 1rem;
 }
 
+/* Canvas styling */
 canvas {
   border: 2px dashed #ccc;
   border-radius: 10px;
+  width: 100%;
+  max-width: 100%;
 }
 
+/* Section/card styling */
 .controls,
 .instructions,
 .results {
@@ -36,25 +44,118 @@ canvas {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.controls select,
-.controls button {
-  padding: 0.5rem;
-  font-size: 1rem;
-  margin-right: 1rem;
-}
-
+/* Label style */
 .label {
   font-weight: bold;
-  margin-right: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
+/* Form group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Controls layout */
+.controls .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Button group section */
+.mode-section {
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+/* Flex layout for buttons */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.button-group button {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* ====================
+   Enhanced Button Styles
+==================== */
+button {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+/* ====================
+   Enhanced Select Styles
+==================== */
+select {
+  padding: 0.6rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: white;
+  color: #333;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* ====================
+   Responsive Tweaks
+==================== */
 @media (max-width: 600px) {
   .controls {
     flex-direction: column;
   }
 
+  .form-group {
+    width: 100%;
+  }
+
   .controls select,
-  .controls button {
+  .controls button,
+  .button-group button {
+    width: 100%;
     margin-bottom: 0.5rem;
+    min-width: unset;
+  }
+
+  .controls .row {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

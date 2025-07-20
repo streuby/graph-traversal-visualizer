@@ -19,27 +19,54 @@
           <li>
             Click anywhere in the canvas to add a node (auto-labeled A, B, C...)
           </li>
-          <li>Click one node, then another to create an edge</li>
-          <li>Select a starting node and traversal method (BFS or DFS)</li>
+          <li>Click one node, then another to create an edge between them</li>
           <li>
-            Click "Run Traversal" to view the result and tracking structure
+            Click on a node and then click "Delete Node" to remove it and all
+            connected edges
           </li>
+          <li>
+            Click on two connected nodes and click "Delete Edge" to remove the
+            edge
+          </li>
+          <li>Select a start node and traversal method (BFS or DFS)</li>
+          <li>Click "Run Traversal" to view result and animation</li>
+          <li>Click "Reset" to clear the entire canvas</li>
         </ul>
       </div>
 
       <div id="canvas-holder"></div>
 
       <div class="controls">
-        <label class="label">Start Node:</label>
-        <select id="startNode"></select>
+        <div class="row">
+          <div class="form-group">
+            <label class="label">Start Node:</label>
+            <select id="startNode"></select>
+          </div>
 
-        <label class="label">Method:</label>
-        <select id="method" onchange="updateStructureDisplay()">
-          <option value="bfs">BFS</option>
-          <option value="dfs">DFS</option>
-        </select>
+          <div class="form-group">
+            <label class="label">Method:</label>
+            <select id="method" onchange="updateStructureDisplay()">
+              <option value="bfs">BFS</option>
+              <option value="dfs">DFS</option>
+            </select>
+          </div>
 
-        <button onclick="runTraversal()">Run Traversal</button>
+          <div class="form-group">
+            <button onclick="runTraversal()">Run Traversal</button>
+          </div>
+        </div>
+
+        <div class="row mode-section">
+          <p>
+            <strong>Current Mode:</strong> <span id="currentMode">Draw</span>
+          </p>
+          <div class="button-group">
+            <button onclick="setMode('draw')">Draw</button>
+            <button onclick="setMode('deleteNode')">Delete Node</button>
+            <button onclick="setMode('deleteEdge')">Delete Edge</button>
+            <button onclick="resetGraph()">Reset Canvas</button>
+          </div>
+        </div>
       </div>
 
       <div class="results">

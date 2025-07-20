@@ -1,87 +1,135 @@
-// Declare arrays to store nodes and edges
-let nodes = [], // Stores all the nodes placed on the canvas
-  edges = [], // Stores all the edges (connections) between nodes
-  selectedNode = null, // Used to track node selection when connecting edges
-  canvas; // Will reference the p5.js canvas
+let nodes = [], // All nodes (vertices)
+  edges = [], // All edges (lines)
+  selectedNode = null, // For creating edges between two nodes
+  canvas, // Canvas element
+  traversalResult = [], // Stores traversal order
+  traversalIndex = 0, // Animation step index
+  isAnimating = false, // Whether animation is in progress
+  currentMode = 'draw'; // Modes: draw, deleteNode, deleteEdge
 
-/**
- * p5.js function called once when the program starts.
- * Sets up the canvas and alignment for text.
- */
+// Runs once to set up the canvas
 function setup() {
-  // Create a canvas of 800px width and 400px height
   canvas = createCanvas(800, 400);
-
-  // Attach canvas to a container div in HTML with id 'canvas-holder'
   canvas.parent('canvas-holder');
-
-  // Center-align text horizontally and vertically
   textAlign(CENTER, CENTER);
 }
 
-/**
- * p5.js function that runs in a loop.
- * Continuously redraws canvas and all elements on it.
- */
+// Redraws everything continuously
 function draw() {
-  background(245); // Set a light background color for the canvas
+  background(245);
 
-  // Draw all the edges (lines between connected nodes)
-  stroke(120); // Set stroke color for lines
+  // Draw all edges
+  stroke(120);
   edges.forEach((edge) => {
-    line(edge.a.x, edge.a.y, edge.b.x, edge.b.y); // Draw line between node a and b
+    line(edge.a.x, edge.a.y, edge.b.x, edge.b.y);
   });
 
-  // Draw all the nodes (circles with labels)
+  // Draw all nodes
   nodes.forEach((node) => {
-    fill('#fff'); // White fill for node circle
-    stroke('#333'); // Dark border
-    ellipse(node.x, node.y, 40); // Draw node circle
-    fill('#000'); // Text color black
-    noStroke(); // No border for text
-    text(node.label, node.x, node.y); // Draw label in center
+    // Highlight traversal path with green
+    if (
+      traversalResult.includes(node.label) &&
+      traversalResult.indexOf(node.label) <= traversalIndex
+    ) {
+      fill('lightgreen');
+    } else {
+      fill('#fff');
+    }
+
+    stroke('#333');
+    ellipse(node.x, node.y, 40);
+    fill('#000');
+    noStroke();
+    text(node.label, node.x, node.y);
   });
+
+  // Slow animation frame rate during traversal
+  if (isAnimating && traversalIndex < traversalResult.length - 1) {
+    frameRate(1); // Slow down for visible animation
+    traversalIndex++;
+  } else {
+    frameRate(60);
+    isAnimating = false;
+  }
 }
 
-/**
- * Handles user mouse click interactions on the canvas.
- * - Adds a new node at click position if no existing node is clicked.
- * - Connects nodes (creates an edge) if a second node is selected.
- */
+// Respond to mouse clicks on canvas
 function mousePressed() {
-  // Ignore clicks outside the canvas area
-  if (mouseY > height) return;
+  if (mouseY > height) return; // Ignore if clicked outside canvas
 
-  // Check if user clicked on an existing node
+  // DELETE NODE MODE
+  if (currentMode === 'deleteNode') {
+    for (let i = 0; i < nodes.length; i++) {
+      if (dist(mouseX, mouseY, nodes[i].x, nodes[i].y) < 20) {
+        let label = nodes[i].label;
+        nodes.splice(i, 1);
+        edges = edges.filter((e) => e.a.label !== label && e.b.label !== label);
+        updateStartNodeDropdown();
+        return;
+      }
+    }
+    return;
+  }
+
+  // DELETE EDGE MODE
+  if (currentMode === 'deleteEdge') {
+    for (let i = 0; i < edges.length; i++) {
+      const { a, b } = edges[i];
+      if (isPointNearEdge(mouseX, mouseY, a, b)) {
+        edges.splice(i, 1);
+        return;
+      }
+    }
+    return;
+  }
+
+  // DRAW MODE (Create or connect nodes)
   for (let node of nodes) {
     if (dist(mouseX, mouseY, node.x, node.y) < 20) {
-      // If a node is already selected and the new click is another node
       if (selectedNode && selectedNode !== node) {
-        edges.push({ a: selectedNode, b: node }); // Create edge between two nodes
-        selectedNode = null; // Reset selection
+        edges.push({ a: selectedNode, b: node });
+        selectedNode = null;
       } else {
-        selectedNode = node; // Select the clicked node
+        selectedNode = node;
       }
-      return; // Exit to avoid creating a new node
+      return;
     }
   }
 
-  // Create a new node if no existing node was clicked
-  let label = String.fromCharCode(65 + nodes.length); // Generate label A, B, C, ...
+  // Create new node
+  let label = String.fromCharCode(65 + nodes.length); // Auto-increment A, B, C...
   let newNode = { x: mouseX, y: mouseY, label };
-  nodes.push(newNode); // Add node to nodes array
-  updateStartNodeDropdown(); // Refresh start node dropdown
+  nodes.push(newNode);
+  updateStartNodeDropdown();
 }
 
-/**
- * Updates the dropdown list with available node labels
- * so the user can pick a starting node.
- */
+// Distance from point to edge
+function isPointNearEdge(px, py, a, b) {
+  const d1 = dist(px, py, a.x, a.y);
+  const d2 = dist(px, py, b.x, b.y);
+  const lineLen = dist(a.x, a.y, b.x, b.y);
+  const buffer = 5;
+  return d1 + d2 >= lineLen - buffer && d1 + d2 <= lineLen + buffer;
+}
+
+// Reset all data
+function resetGraph() {
+  nodes = [];
+  edges = [];
+  selectedNode = null;
+  traversalResult = [];
+  traversalIndex = 0;
+  isAnimating = false;
+  updateStartNodeDropdown();
+  document.getElementById('output').textContent = 'None yet';
+  document.getElementById('structureUsed').textContent = '-';
+  document.getElementById('chosenMethod').textContent = '-';
+}
+
+// Dropdown for selecting start node
 function updateStartNodeDropdown() {
   const dropdown = document.getElementById('startNode');
-  dropdown.innerHTML = ''; // Clear current options
-
-  // Add all node labels as dropdown options
+  dropdown.innerHTML = '';
   nodes.forEach((n) => {
     const opt = document.createElement('option');
     opt.value = n.label;
@@ -90,40 +138,28 @@ function updateStartNodeDropdown() {
   });
 }
 
-/**
- * Builds an adjacency list from the current nodes and edges.
- * This is used as the internal graph representation.
- */
+// Create adjacency list from graph
 function buildAdjList() {
   let adj = {};
-
-  // Initialize adjacency list with all nodes
   nodes.forEach((n) => (adj[n.label] = []));
-
-  // Add connections (edges are undirected)
   edges.forEach((e) => {
-    adj[e.a.label].push(e.b.label); // Edge from A to B
-    adj[e.b.label].push(e.a.label); // Edge from B to A
+    adj[e.a.label].push(e.b.label);
+    adj[e.b.label].push(e.a.label);
   });
-
   return adj;
 }
 
-/**
- * Performs Breadth-First Search (BFS) traversal on the graph.
- * Returns the traversal order and the data structure used.
- */
+// BFS Traversal with queue
 function bfs(graph, start) {
-  let visited = new Set(); // Tracks visited nodes
-  let queue = [start]; // Initialize queue with start node
-  let result = []; // Store traversal order
+  let visited = new Set();
+  let queue = [start];
+  let result = [];
 
   while (queue.length) {
-    let node = queue.shift(); // Get next node from queue
+    let node = queue.shift();
     if (!visited.has(node)) {
-      visited.add(node); // Mark node as visited
-      result.push(node); // Add to traversal result
-      // Add unvisited neighbors to queue
+      visited.add(node);
+      result.push(node);
       queue.push(...graph[node].filter((n) => !visited.has(n)));
     }
   }
@@ -131,60 +167,60 @@ function bfs(graph, start) {
   return { order: result, structure: 'Queue' };
 }
 
-/**
- * Performs Depth-First Search (DFS) traversal on the graph.
- * Returns the traversal order and the data structure used.
- */
+// DFS Traversal with recursion
 function dfs(graph, start) {
-  let visited = new Set(); // Tracks visited nodes
-  let result = []; // Store traversal order
+  let visited = new Set();
+  let result = [];
 
-  // Recursive function to explore each node
   function explore(node) {
-    visited.add(node); // Mark current node as visited
-    result.push(node); // Add to traversal result
-
-    // Recursively visit each unvisited neighbor
+    visited.add(node);
+    result.push(node);
     for (let n of graph[node]) {
       if (!visited.has(n)) explore(n);
     }
   }
 
-  explore(start); // Start exploring from the selected node
-  return { order: result, structure: 'Stack (implicit via recursion)' };
+  explore(start);
+  return { order: result, structure: 'Stack (recursive)' };
 }
 
-/**
- * Updates the UI to display the type of data structure used
- * based on the selected traversal method.
- */
+// Update UI display based on method selected
 function updateStructureDisplay() {
   const method = document.getElementById('method').value;
   document.getElementById('structureUsed').textContent =
     method === 'bfs' ? 'Queue' : 'Stack (recursive)';
 }
 
-/**
- * Triggers the traversal process when user clicks "Run".
- * Shows the traversal order, data structure used, and method.
- */
+// Run traversal animation
 function runTraversal() {
-  if (!nodes.length) return; // No graph drawn yet
+  if (!nodes.length) return;
 
   const start = document.getElementById('startNode').value;
   const method = document.getElementById('method').value;
   const graph = buildAdjList();
   let resultObj;
 
-  // Execute chosen traversal algorithm
   if (method === 'bfs') {
     resultObj = bfs(graph, start);
   } else {
     resultObj = dfs(graph, start);
   }
 
-  // Display results in UI
+  traversalResult = resultObj.order;
+  traversalIndex = 0;
+  isAnimating = true;
+
   document.getElementById('chosenMethod').textContent = method.toUpperCase();
   document.getElementById('structureUsed').textContent = resultObj.structure;
   document.getElementById('output').textContent = resultObj.order.join(' ➝ ');
+}
+
+// UI mode switch
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('currentMode').textContent = {
+    draw: 'Draw',
+    deleteNode: 'Delete Node',
+    deleteEdge: 'Delete Edge',
+  }[mode];
 }
