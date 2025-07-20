@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Graph Traversal Visualizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Graph Traversal Visualizer</h1>
+    </header>
+
+    <div class="container">
+      <div class="instructions">
+        <h3>📌 Instructions</h3>
+        <ul>
+          <li>
+            Click anywhere in the canvas to add a node (auto-labeled A, B, C...)
+          </li>
+          <li>Click one node, then another to create an edge</li>
+          <li>Select a starting node and traversal method (BFS or DFS)</li>
+          <li>
+            Click "Run Traversal" to view the result and tracking structure
+          </li>
+        </ul>
+      </div>
+
+      <div id="canvas-holder"></div>
+
+      <div class="controls">
+        <label class="label">Start Node:</label>
+        <select id="startNode"></select>
+
+        <label class="label">Method:</label>
+        <select id="method" onchange="updateStructureDisplay()">
+          <option value="bfs">BFS</option>
+          <option value="dfs">DFS</option>
+        </select>
+
+        <button onclick="runTraversal()">Run Traversal</button>
+      </div>
+
+      <div class="results">
+        <h3>🔁 Traversal Result</h3>
+        <p><strong>Method:</strong> <span id="chosenMethod">-</span></p>
+        <p>
+          <strong>Data Structure Used:</strong>
+          <span id="structureUsed">-</span>
+        </p>
+        <p>
+          <strong>Traversal Order:</strong> <span id="output">None yet</span>
+        </p>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
